@@ -1,48 +1,65 @@
-import React, {Component} from 'react'
+import React from 'react'
 import {Button, Input ,List} from "antd";
-// import store from './store'
-import {connect} from 'react-redux'
+// import store from './store';
+import {connect} from 'react-redux';
+import * as actionTypes from './store/actionTypes';
 import 'antd/dist/antd.css';
 
-class TodoList extends Component{
+const TodoList = (props) =>{
 
-    constructor(props){
-        super(props);
-        this.handleInputChange = this.handleInputChange.bind(this);
+        const {inputValue,changeInputValue,handleClick,list,handleDelete} = props;
 
-    }
-
-    render() {
         return(
             <div style={{marginTop: '10px', marginLeft: '10px'}}>
                 <div>
                     <Input
                         placeholder="todo info"
                         style={{width: '300px', marginRight: '10px'}}
-                        value={this.props.inputValue}
-                        onChange={this.handleInputChange}
+                        value={inputValue}
+                        onChange={changeInputValue}
                     />
-                    <Button type="primary">提交</Button>
+                    <Button type="primary" onClick={handleClick}>提交</Button>
                 </div>
                 <List
                     style={{marginTop: '10px', width: '300px'}}
                     rowKey={List.item}
                     bordered
-                    dataSource={['Dell']}
+                    dataSource={list}
                     renderItem={(item, index) => (
-                        <List.Item onClick={() => {}}>{item}</List.Item>)}
+                        <List.Item onClick={() => {handleDelete(index)}}>{item}</List.Item>)}
                 />
             </div>
         )
-    }
-
-    handleInputChange(e){
-        console.log(e.target.value);
-    }
 }
+
 const mapStateToProps = (state) =>{
     return{
-        inputValue: state.inputValue
+        inputValue: state.inputValue,
+        list: state.list
     }
 }
-export default connect(mapStateToProps,null)(TodoList);
+const mapDispatchToProps = (dispatch) => {
+    return {
+         changeInputValue(e){
+            const  action = {
+                type: actionTypes.CHANGE_INPUT_VALUE,
+                value: e.target.value
+            }
+            dispatch(action);
+         },
+         handleClick(){
+           const  action = {
+             type: actionTypes.ADD_TODO_ITEM
+           }
+            dispatch(action)
+         },
+         handleDelete(index){
+            const action = {
+             type: actionTypes.DELETE_TODO_ITEM,
+                index
+            }
+            dispatch(action)
+         }
+    }
+}
+export default connect(mapStateToProps,mapDispatchToProps)(TodoList);
